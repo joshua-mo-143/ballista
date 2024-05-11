@@ -46,3 +46,6 @@ tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread", "sync"] }
 tokio-stream = "0.1.15"
 tokio-tar = "0.3.1"
 tower-http = { version = "0.5.2", features = ["fs"] }
+
+[dev-dependencies]
+rusty-hook = "0.11.2"

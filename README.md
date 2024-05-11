@@ -14,6 +14,8 @@ This service is primarily (currently) deployed through Shuttle. To deploy it, do
   - `GITHUB_REPO` - The repo you want to ingest. Note that only Markdown files are supported for now - Ballista will ignore anything else.
   - `QDRANT_URL` - The URL of your Qdrant database. Note that the port needs to be 6334 as `qdrant_client` utilises the gRPC URL. If you're just trying this out locally, you can leave it blank.
   - `QDRANT_API_KEY` - Your Qdrant API key. You can leave this blank if you're just running this locally.
+- Run `cargo shuttle deploy` and watch the magic happen!
+- Visit your deployment URL and try writing a prompt.
   
 ## Features
 - Downloads your Markdown files from a GitHub repo and ingests it into ChatGPT embeddings, then stores it in Qdrant.
