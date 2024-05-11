@@ -1,11 +1,11 @@
 use axum::{routing::post, Router};
 
-use brain::routes::prompt::prompt;
-use brain::routes::webhooks::handle_github_webhook;
+use ballista::routes::prompt::prompt;
+use ballista::routes::webhooks::handle_github_webhook;
 
-use brain::state::{AppState, AppStateBuilder};
+use ballista::state::{AppState, AppStateBuilder};
 
-use brain::qdrant::VectorDB;
+use ballista::qdrant::VectorDB;
 use std::env;
 
 use std::sync::Arc;
@@ -26,7 +26,7 @@ async fn main(
         }
     });
 
-    brain::open_ai::setup().expect("Set up OpenAI key");
+    ballista::open_ai::setup().expect("Set up OpenAI key");
 
     let vector_db = VectorDB::from_qdrant_client(qdrant);
 

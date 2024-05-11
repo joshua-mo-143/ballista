@@ -1,11 +1,11 @@
 use anyhow::Result;
 use axum::{routing::post, Router};
 
-use brain::routes::prompt::prompt;
-use brain::routes::webhooks::handle_github_webhook;
+use ballista::routes::prompt::prompt;
+use ballista::routes::webhooks::handle_github_webhook;
 
-use brain::open_ai;
-use brain::state::AppStateBuilder;
+use ballista::open_ai;
+use ballista::state::{AppState, AppStateBuilder};
 use tokio::net::TcpListener;
 
 use std::sync::Arc;
@@ -18,7 +18,7 @@ async fn main() -> Result<()> {
     let state = AppStateBuilder::new().build()?;
     let state = Arc::new(state);
 
-    let cloned_state = Arc::clone(&state);
+    let cloned_state: Arc<AppState> = Arc::clone(&state);
 
     tokio::spawn(async move {
         cloned_state.run_update_queue().await;

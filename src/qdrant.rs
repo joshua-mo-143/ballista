@@ -23,7 +23,7 @@ pub struct VectorDB {
 
 impl VectorDB {
     pub fn new() -> Result<Self> {
-        let qdrant_url = env::var("QDRANT_URL").unwrap_or_else(|x| {
+        let qdrant_url = env::var("QDRANT_URL").unwrap_or_else(|_| {
             println!("No QDRANT_URL env var found! Defaulting to localhost:6334...");
             "http://localhost:6334".to_string()
         });

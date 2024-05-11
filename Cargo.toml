@@ -1,12 +1,12 @@
 [package]
-name = "brain"
+name = "ballista"
 version = "0.1.0"
 edition = "2021"
-default-run = "brain"
+default-run = "ballista"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [[bin]]
-name = "brain"
+name = "ballista"
 path = "src/bin/shuttle.rs"
 required-features = ["shuttle"]
 
