@@ -1,0 +1,48 @@
+[package]
+name = "brain"
+version = "0.1.0"
+edition = "2021"
+default-run = "brain"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "brain"
+path = "src/bin/shuttle.rs"
+required-features = ["shuttle"]
+
+[[bin]]
+name = "standalone"
+path = "src/bin/standalone.rs"
+
+[features]
+default = ["shuttle"]
+shuttle = [
+        "dep:shuttle-runtime",
+        "dep:shuttle-axum",
+        "dep:shuttle-qdrant",
+]
+
+
+[dependencies]
+anyhow = "1.0.82"
+axum = "0.7.5"
+axum-streams = { version = "0.14.2", features = ["text"] }
+bytes = "1.6.0"
+flate2 = "1.0.30"
+futures = "0.3.30"
+http-body = "1.0.0"
+http-body-util = "0.1.1"
+octocrab = "0.38.0"
+openai = "1.0.0-alpha.14"
+qdrant-client = "1.9.0"
+regex = "1.10.4"
+serde = { version = "1.0.201", features = ["derive"] }
+serde_json = "1.0.117"
+shuttle-axum = { version = "0.44.0", optional = true }
+shuttle-qdrant = { version = "0.44.0", optional = true }
+shuttle-runtime = { version = "0.44.0", optional = true }
+tempfile = "3.10.1"
+tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread", "sync"] }
+tokio-stream = "0.1.15"
+tokio-tar = "0.3.1"
+tower-http = { version = "0.5.2", features = ["fs"] }

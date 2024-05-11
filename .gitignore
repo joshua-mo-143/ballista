@@ -1,0 +1,4 @@
+/target
+.env
+Secrets*.toml
+/qdrant_storage
