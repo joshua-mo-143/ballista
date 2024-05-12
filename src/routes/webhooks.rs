@@ -12,7 +12,7 @@ use octocrab::models::{
 use serde::Deserialize;
 use std::sync::Arc;
 
-use crate::state::AppState;
+use crate::{open_ai::LLMBackend, state::AppState};
 
 #[derive(Deserialize)]
 pub struct WebhookEvent {
@@ -27,9 +27,12 @@ pub struct WebhookEvent {
 pub struct GithubEvent(WebhookEvent);
 
 #[axum::async_trait]
-impl FromRequest<Arc<AppState>> for GithubEvent {
+impl<T: LLMBackend> FromRequest<Arc<AppState<T>>> for GithubEvent {
     type Rejection = Response;
-    async fn from_request(req: Request, _state: &Arc<AppState>) -> Result<Self, Self::Rejection> {
+    async fn from_request(
+        req: Request,
+        _state: &Arc<AppState<T>>,
+    ) -> Result<Self, Self::Rejection> {
         let Some(_event_type) = req.headers().get("X-Github-Event") else {
             return Err((StatusCode::BAD_REQUEST, "Incorrect headers").into_response());
         };
@@ -48,8 +51,8 @@ impl FromRequest<Arc<AppState>> for GithubEvent {
     }
 }
 
-pub async fn handle_github_webhook(
-    State(state): State<Arc<AppState>>,
+pub async fn handle_github_webhook<T: LLMBackend>(
+    State(state): State<Arc<AppState<T>>>,
     GithubEvent(evt): GithubEvent,
 ) -> impl IntoResponse {
     match evt.kind {

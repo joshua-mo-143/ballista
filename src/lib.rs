@@ -5,6 +5,7 @@ pub mod qdrant;
 pub mod routes;
 pub mod state;
 
+use open_ai::LLMBackend;
 use tokio::sync::mpsc::Receiver;
 
 use anyhow::Result;
@@ -13,10 +14,19 @@ use openai::chat::ChatCompletionDelta;
 use qdrant::VectorDB;
 use state::AppState;
 
-async fn embed_documentation(files: &mut Vec<File>, vector_db: &mut VectorDB) -> Result<()> {
+use crate::open_ai::EmbeddingsResult;
+
+async fn embed_documentation<T: LLMBackend>(
+    files: &mut Vec<File>,
+    vector_db: &mut VectorDB,
+    llm: &T,
+) -> Result<()> {
     for file in files {
-        let embeddings = open_ai::embed_file(file).await?;
+        let embeddings = llm.embed_file(file).await?;
         println!("Embedding: {:?}", file.path);
+        let EmbeddingsResult::OpenAIEmbeddings(embeddings) = embeddings else {
+            return Err(anyhow::anyhow!("Embeddings were the wrong enum variant :("));
+        };
         for embedding in embeddings.data {
             vector_db.upsert_embedding(embedding, file).await?;
         }
@@ -25,8 +35,14 @@ async fn embed_documentation(files: &mut Vec<File>, vector_db: &mut VectorDB) ->
     Ok(())
 }
 
-async fn get_contents(prompt: &str, state: &AppState) -> Result<Receiver<ChatCompletionDelta>> {
-    let embedding = open_ai::embed_sentence(prompt).await?;
+async fn get_contents<T: LLMBackend>(
+    prompt: &str,
+    state: &AppState<T>,
+) -> Result<Receiver<ChatCompletionDelta>> {
+    let embedding = state.llm.embed_sentence(prompt).await?;
+    let EmbeddingsResult::OpenAIEmbedding(embedding) = embedding else {
+        return Err(anyhow::anyhow!("Embedding was the wrong enum variant :("));
+    };
     let result = state.db.search(embedding).await?;
     let contents = state
         .files

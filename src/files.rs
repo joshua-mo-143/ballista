@@ -94,6 +94,7 @@ pub fn load_files_from_dir(dir: PathBuf, ending: &str, prefix: &PathBuf) -> Resu
     }
     Ok(files)
 }
+
 enum FileState {
     None,
     CodeBlock,

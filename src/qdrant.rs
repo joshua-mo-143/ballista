@@ -1,3 +1,4 @@
+use crate::open_ai::Embeddable;
 use anyhow::Result;
 use openai::embeddings::Embedding;
 use qdrant_client::prelude::{
@@ -68,7 +69,11 @@ impl VectorDB {
         Ok(())
     }
 
-    pub async fn upsert_embedding(&mut self, embedding: Embedding, file: &File) -> Result<()> {
+    pub async fn upsert_embedding<T: Embeddable>(
+        &mut self,
+        embedding: T,
+        file: &File,
+    ) -> Result<()> {
         let payload: Payload = json!({
             "id": file.path.clone(),
         })
@@ -77,7 +82,7 @@ impl VectorDB {
 
         println!("Embedded: {}", file.path);
 
-        let vec: Vec<f32> = embedding.vec.iter().map(|&x| x as f32).collect();
+        let vec = embedding.into_vec_f32();
 
         let points = vec![PointStruct::new(self.id, vec, payload)];
         self.client

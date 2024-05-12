@@ -1,24 +1,33 @@
 use anyhow::Result;
 use axum::{routing::post, Router};
+use ballista::open_ai::LLMBackend;
 
 use ballista::routes::prompt::prompt;
 use ballista::routes::webhooks::handle_github_webhook;
 
-use ballista::open_ai;
+use ballista::qdrant::VectorDB;
 use ballista::state::{AppState, AppStateBuilder};
 use tokio::net::TcpListener;
+
+use ballista::open_ai::OpenAIBackend;
 
 use std::sync::Arc;
 use tower_http::services::ServeDir;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    open_ai::setup().expect("Set up OpenAI key");
+    let vector_db = VectorDB::new()?;
 
-    let state = AppStateBuilder::new().build()?;
+    let llm_backend = OpenAIBackend::new()?;
+
+    let state = AppStateBuilder::new()
+        .with_qdrant_client(vector_db)
+        .with_llm(llm_backend)
+        .build()?;
+
     let state = Arc::new(state);
 
-    let cloned_state: Arc<AppState> = Arc::clone(&state);
+    let cloned_state: Arc<AppState<OpenAIBackend>> = Arc::clone(&state);
 
     tokio::spawn(async move {
         cloned_state.run_update_queue().await;

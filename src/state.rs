@@ -7,23 +7,26 @@ use crate::{embed_documentation, files::load_files_from_dir, github::Octo, qdran
 
 use crate::files::File;
 
+use crate::open_ai::LLMBackend;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-pub struct AppState {
+pub struct AppState<T: LLMBackend> {
     pub files: Arc<RwLock<Vec<File>>>,
     pub notify: Arc<Notify>,
     pub db: VectorDB,
     pub octo: Octo,
+    pub llm: T,
 }
 
-impl AppState {
-    pub fn new(db: VectorDB, octo: Octo) -> Result<Self> {
+impl<T: LLMBackend> AppState<T> {
+    pub fn new(db: VectorDB, octo: Octo, llm: T) -> Result<Self> {
         Ok(Self {
             files: Arc::new(RwLock::new(Vec::new())),
             notify: Arc::new(Notify::new()),
             db,
             octo,
+            llm,
         })
     }
 
@@ -37,7 +40,7 @@ impl AppState {
         let mut db = VectorDB::new()?;
 
         db.reset_collection().await?;
-        embed_documentation(&mut files, &mut db).await?;
+        embed_documentation(&mut files, &mut db, &self.llm).await?;
 
         let mut lock = self.files.write().await;
         *lock = files;
@@ -57,13 +60,19 @@ impl AppState {
     }
 }
 
-#[derive(Default)]
-pub struct AppStateBuilder {
+pub struct AppStateBuilder<T: LLMBackend> {
     pub db: Option<VectorDB>,
     pub octo: Option<Octo>,
+    pub llm: Option<T>,
 }
 
-impl AppStateBuilder {
+impl<T: LLMBackend> Default for AppStateBuilder<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<T: LLMBackend> AppStateBuilder<T> {
     pub fn new() -> Self {
         Self {
             ..Default::default()
@@ -82,7 +91,13 @@ impl AppStateBuilder {
         self
     }
 
-    pub fn build(self) -> Result<AppState> {
+    pub fn with_llm(mut self, llm: T) -> Self {
+        self.llm = Some(llm);
+
+        self
+    }
+
+    pub fn build(self) -> Result<AppState<T>> {
         let db = match self.db {
             Some(db) => db,
             None => VectorDB::new()?,
@@ -93,6 +108,11 @@ impl AppStateBuilder {
             None => Octo::new()?,
         };
 
-        AppState::new(db, octo)
+        let llm = match self.llm {
+            Some(llm) => llm,
+            None => return Err(anyhow::anyhow!("Couldn't find an LLM")),
+        };
+
+        AppState::new(db, octo, llm)
     }
 }
