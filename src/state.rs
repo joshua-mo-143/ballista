@@ -7,11 +7,11 @@ use crate::{embed_documentation, files::load_files_from_dir, github::Octo, qdran
 
 use crate::files::File;
 
-use crate::open_ai::LLMBackend;
+use crate::llm::{LLMBackend, PromptBackend};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-pub struct AppState<T: LLMBackend> {
+pub struct AppState<T: LLMBackend + PromptBackend> {
     pub files: Arc<RwLock<Vec<File>>>,
     pub notify: Arc<Notify>,
     pub db: VectorDB,
@@ -19,7 +19,7 @@ pub struct AppState<T: LLMBackend> {
     pub llm: T,
 }
 
-impl<T: LLMBackend> AppState<T> {
+impl<T: LLMBackend + PromptBackend> AppState<T> {
     pub fn new(db: VectorDB, octo: Octo, llm: T) -> Result<Self> {
         Ok(Self {
             files: Arc::new(RwLock::new(Vec::new())),
@@ -60,19 +60,19 @@ impl<T: LLMBackend> AppState<T> {
     }
 }
 
-pub struct AppStateBuilder<T: LLMBackend> {
+pub struct AppStateBuilder<T: LLMBackend + PromptBackend> {
     pub db: Option<VectorDB>,
     pub octo: Option<Octo>,
     pub llm: Option<T>,
 }
 
-impl<T: LLMBackend> Default for AppStateBuilder<T> {
+impl<T: LLMBackend + PromptBackend> Default for AppStateBuilder<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T: LLMBackend> AppStateBuilder<T> {
+impl<T: LLMBackend + PromptBackend> AppStateBuilder<T> {
     pub fn new() -> Self {
         Self {
             ..Default::default()

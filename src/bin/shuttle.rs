@@ -1,6 +1,6 @@
 use axum::{routing::post, Router};
 
-use ballista::open_ai::{LLMBackend, OpenAIBackend};
+use ballista::llm::{open_ai::OpenAIBackend, LLMBackend};
 use ballista::routes::prompt::prompt;
 use ballista::routes::webhooks::handle_github_webhook;
 

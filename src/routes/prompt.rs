@@ -7,7 +7,10 @@ use futures::StreamExt;
 use serde::Deserialize;
 use tokio_stream::wrappers::ReceiverStream;
 
-use crate::{open_ai::LLMBackend, state::AppState};
+use crate::{
+    llm::{LLMBackend, PromptBackend},
+    state::AppState,
+};
 
 use futures::stream::Stream;
 #[derive(Deserialize)]
@@ -32,7 +35,7 @@ fn error_stream() -> impl Stream<Item = String> {
     futures::stream::once(async move { "Error with your prompt".to_string() })
 }
 
-pub async fn prompt<T: LLMBackend>(
+pub async fn prompt<T: LLMBackend + PromptBackend>(
     State(app_state): State<Arc<AppState<T>>>,
     Json(Prompt { prompt }): Json<Prompt>,
 ) -> impl IntoResponse {

@@ -1,4 +1,4 @@
-use crate::open_ai::Embeddable;
+use crate::llm::Embeddable;
 use anyhow::Result;
 use openai::embeddings::Embedding;
 use qdrant_client::prelude::{

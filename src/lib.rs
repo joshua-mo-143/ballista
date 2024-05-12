@@ -1,20 +1,16 @@
 pub mod files;
 pub mod github;
-pub mod open_ai;
+pub mod llm;
 pub mod qdrant;
 pub mod routes;
 pub mod state;
 
-use open_ai::LLMBackend;
-use tokio::sync::mpsc::Receiver;
+use llm::{Conversation, EmbeddingsResult, LLMBackend, PromptBackend};
 
 use anyhow::Result;
 use files::{File, Finder};
-use openai::chat::ChatCompletionDelta;
 use qdrant::VectorDB;
 use state::AppState;
-
-use crate::open_ai::EmbeddingsResult;
 
 async fn embed_documentation<T: LLMBackend>(
     files: &mut Vec<File>,
@@ -35,10 +31,10 @@ async fn embed_documentation<T: LLMBackend>(
     Ok(())
 }
 
-async fn get_contents<T: LLMBackend>(
+async fn get_contents<T: LLMBackend + PromptBackend>(
     prompt: &str,
     state: &AppState<T>,
-) -> Result<Receiver<ChatCompletionDelta>> {
+) -> Result<Conversation> {
     let embedding = state.llm.embed_sentence(prompt).await?;
     let EmbeddingsResult::OpenAIEmbedding(embedding) = embedding else {
         return Err(anyhow::anyhow!("Embedding was the wrong enum variant :("));
@@ -50,5 +46,5 @@ async fn get_contents<T: LLMBackend>(
         .await
         .get_contents(&result)
         .ok_or(anyhow::anyhow!("There was a prompt error :("))?;
-    open_ai::chat_stream(prompt, contents.as_str()).await
+    state.llm.chat_stream(prompt, contents.as_str()).await
 }

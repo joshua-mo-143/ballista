@@ -1,6 +1,6 @@
 use anyhow::Result;
 use axum::{routing::post, Router};
-use ballista::open_ai::LLMBackend;
+use ballista::llm::{open_ai::OpenAIBackend, LLMBackend};
 
 use ballista::routes::prompt::prompt;
 use ballista::routes::webhooks::handle_github_webhook;
@@ -8,8 +8,6 @@ use ballista::routes::webhooks::handle_github_webhook;
 use ballista::qdrant::VectorDB;
 use ballista::state::{AppState, AppStateBuilder};
 use tokio::net::TcpListener;
-
-use ballista::open_ai::OpenAIBackend;
 
 use std::sync::Arc;
 use tower_http::services::ServeDir;
