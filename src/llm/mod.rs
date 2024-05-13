@@ -1,7 +1,9 @@
+pub mod candle;
 pub mod open_ai;
 
 use crate::files::File;
 use anyhow::Result;
+
 use openai::chat::ChatCompletionDelta;
 use openai::embeddings::{Embedding, Embeddings};
 use tokio::sync::mpsc::Receiver;
@@ -18,9 +20,17 @@ impl Embeddable for Embedding {
     }
 }
 
+impl Embeddable for Vec<f32> {
+    fn into_vec_f32(self) -> Vec<f32> {
+        self
+    }
+}
+
 pub enum EmbeddingsResult {
     OpenAIEmbeddings(Embeddings),
     OpenAIEmbedding(Embedding),
+    CandleEmbeddings(Vec<Vec<f32>>),
+    CandleEmbedding(Vec<Vec<f32>>),
 }
 
 #[async_trait::async_trait]

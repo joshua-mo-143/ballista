@@ -1,6 +1,6 @@
 use crate::llm::Embeddable;
 use anyhow::Result;
-use openai::embeddings::Embedding;
+
 use qdrant_client::prelude::{
     CreateCollection, Distance, Payload, PointStruct, QdrantClient, QdrantClientConfig,
 };
@@ -93,16 +93,14 @@ impl VectorDB {
         Ok(())
     }
 
-    pub async fn search(&self, embedding: Embedding) -> Result<ScoredPoint> {
-        let vec: Vec<f32> = embedding.vec.iter().map(|&x| x as f32).collect();
-
+    pub async fn search(&self, embedding: Vec<f32>) -> Result<ScoredPoint> {
         let payload_selector = WithPayloadSelector {
             selector_options: Some(SelectorOptions::Enable(true)),
         };
 
         let search_points = SearchPoints {
             collection_name: COLLECTION.to_string(),
-            vector: vec,
+            vector: embedding,
             limit: 1,
             with_payload: Some(payload_selector),
             ..Default::default()

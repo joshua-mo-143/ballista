@@ -15,7 +15,7 @@ name = "standalone"
 path = "src/bin/standalone.rs"
 
 [features]
-default = ["shuttle", "openai"]
+default = ["shuttle", "candle", "openai"]
 shuttle = [
         "dep:shuttle-runtime",
         "dep:shuttle-axum",
@@ -65,7 +65,7 @@ candle-nn = { version = "0.5.0", optional = true }
 candle-core = { version = "0.5.0", optional = true }
 candle-transformers = { version = "0.5.0", optional = true }
 hf-hub = { version = "0.3.2", features = ["tokio"], optional = true }
-tokenizers = { version = "0.19.1", optional = true }
+tokenizers = { version = "0.19.1", optional = true, features = ["hf-hub"] }
 fastembed = "3.5.0"
 
 [dev-dependencies]

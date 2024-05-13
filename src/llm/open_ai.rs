@@ -17,7 +17,7 @@ impl PromptBackend for OpenAIBackend {
     async fn chat_stream(&self, prompt: &str, contents: &str) -> Result<Conversation> {
         let content = format!("{}\n Context: {}\n Be concise", prompt, contents);
 
-        Ok(ChatCompletionBuilder::default()
+        let stream = ChatCompletionBuilder::default()
             .model("gpt-3.5-turbo")
             .temperature(0.0)
             .user("shuttle")
@@ -28,7 +28,9 @@ impl PromptBackend for OpenAIBackend {
                 function_call: None,
             }])
             .create_stream()
-            .await?)
+            .await?;
+
+        Ok(stream)
     }
 }
 
