@@ -19,23 +19,22 @@ pub struct AppState<T: LLMBackend + PromptBackend> {
     pub llm: T,
 }
 
-impl<T: LLMBackend + PromptBackend> AppState<T> {
-    pub fn new(db: VectorDB, octo: Octo, llm: T) -> Result<Self> {
+impl<T: LLMBackend + PromptBackend + Send + Sync> AppState<T> {
+    pub fn new(db: VectorDB, llm: T) -> Result<Self> {
         Ok(Self {
             files: Arc::new(RwLock::new(Vec::new())),
             notify: Arc::new(Notify::new()),
             db,
-            octo,
+            octo: Octo::new()?,
             llm,
         })
     }
 
     pub async fn update(&self) -> Result<()> {
         let temp_dir = tempdir()?;
-        self.octo.download_repo(&temp_dir).await?;
+        let path = self.octo.download_repo(&temp_dir).await?;
 
-        let mut files =
-            load_files_from_dir(temp_dir.path().to_path_buf(), "md", &PathBuf::from(""))?;
+        let mut files = load_files_from_dir(temp_dir.path().to_path_buf(), "md", &path)?;
 
         let mut db = VectorDB::new()?;
 
@@ -44,6 +43,8 @@ impl<T: LLMBackend + PromptBackend> AppState<T> {
 
         let mut lock = self.files.write().await;
         *lock = files;
+
+        println!("All files have been embedded!");
 
         Ok(())
     }
@@ -55,64 +56,8 @@ impl<T: LLMBackend + PromptBackend> AppState<T> {
             let _ = self
                 .update()
                 .await
-                .inspect_err(|x| println!("Error while updating application state: {x}"));
+                .inspect_err(|x| println!("Error while updating application state: {x}"))
+                .unwrap();
         }
-    }
-}
-
-pub struct AppStateBuilder<T: LLMBackend + PromptBackend> {
-    pub db: Option<VectorDB>,
-    pub octo: Option<Octo>,
-    pub llm: Option<T>,
-}
-
-impl<T: LLMBackend + PromptBackend> Default for AppStateBuilder<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<T: LLMBackend + PromptBackend> AppStateBuilder<T> {
-    pub fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
-    }
-
-    pub fn with_qdrant_client(mut self, db: VectorDB) -> Self {
-        self.db = Some(db);
-
-        self
-    }
-
-    pub fn with_octo(mut self, octo: Octo) -> Self {
-        self.octo = Some(octo);
-
-        self
-    }
-
-    pub fn with_llm(mut self, llm: T) -> Self {
-        self.llm = Some(llm);
-
-        self
-    }
-
-    pub fn build(self) -> Result<AppState<T>> {
-        let db = match self.db {
-            Some(db) => db,
-            None => VectorDB::new()?,
-        };
-
-        let octo = match self.octo {
-            Some(db) => db,
-            None => Octo::new()?,
-        };
-
-        let llm = match self.llm {
-            Some(llm) => llm,
-            None => return Err(anyhow::anyhow!("Couldn't find an LLM")),
-        };
-
-        AppState::new(db, octo, llm)
     }
 }

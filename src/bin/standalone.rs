@@ -6,7 +6,7 @@ use ballista::routes::prompt::prompt;
 use ballista::routes::webhooks::handle_github_webhook;
 
 use ballista::qdrant::VectorDB;
-use ballista::state::{AppState, AppStateBuilder};
+use ballista::state::AppState;
 use tokio::net::TcpListener;
 
 use std::sync::Arc;
@@ -14,14 +14,16 @@ use tower_http::services::ServeDir;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    dotenvy::dotenv().ok();
+    dotenvy::vars().for_each(|(key, value)| {
+        std::env::set_var(key, value);
+    });
+
     let vector_db = VectorDB::new()?;
 
     let llm_backend = OpenAIBackend::new()?;
 
-    let state = AppStateBuilder::new()
-        .with_qdrant_client(vector_db)
-        .with_llm(llm_backend)
-        .build()?;
+    let state = AppState::new(vector_db, llm_backend)?;
 
     let state = Arc::new(state);
 

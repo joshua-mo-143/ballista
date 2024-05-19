@@ -14,7 +14,7 @@ use std::sync::Arc;
 use crate::files::File;
 use std::env;
 
-static COLLECTION: &str = "brain";
+static COLLECTION: &str = "ballista";
 
 #[derive(Clone)]
 pub struct VectorDB {
@@ -46,9 +46,7 @@ impl VectorDB {
         }
     }
 
-    pub async fn reset_collection(&self) -> Result<()> {
-        self.client.delete_collection(COLLECTION).await?;
-
+    pub async fn create_collection(&self) -> Result<()> {
         self.client
             .create_collection(&CreateCollection {
                 collection_name: COLLECTION.to_string(),
@@ -68,12 +66,15 @@ impl VectorDB {
 
         Ok(())
     }
+    pub async fn reset_collection(&self) -> Result<()> {
+        self.client.delete_collection(COLLECTION).await?;
 
-    pub async fn upsert_embedding<T: Embeddable>(
-        &mut self,
-        embedding: T,
-        file: &File,
-    ) -> Result<()> {
+        self.create_collection().await?;
+
+        Ok(())
+    }
+
+    pub async fn upsert_embedding<T: Embeddable>(&self, embedding: T, file: &File) -> Result<()> {
         let payload: Payload = json!({
             "id": file.path.clone(),
         })
@@ -88,7 +89,6 @@ impl VectorDB {
         self.client
             .upsert_points(COLLECTION, None, points, None)
             .await?;
-        self.id += 1;
 
         Ok(())
     }
@@ -107,7 +107,11 @@ impl VectorDB {
         };
 
         let search_result = self.client.search_points(&search_points).await?;
-        let result = search_result.result[0].clone();
-        Ok(result)
+        let result = search_result.result.into_iter().next();
+
+        match result {
+            Some(res) => Ok(res),
+            None => Err(anyhow::anyhow!("There were no results that matched :(")),
+        }
     }
 }

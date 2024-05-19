@@ -15,7 +15,7 @@ use state::AppState;
 
 async fn embed_documentation<T: LLMBackend>(
     files: &mut Vec<File>,
-    vector_db: &mut VectorDB,
+    vector_db: &VectorDB,
     llm: &T,
 ) -> Result<()> {
     for file in files {
@@ -25,14 +25,17 @@ async fn embed_documentation<T: LLMBackend>(
         match embeddings {
             EmbeddingsResult::OpenAIEmbeddings(embeddings) => {
                 for embedding in embeddings.data {
-                    vector_db.upsert_embedding(embedding, file).await?;
+                    let file_clone = file.clone();
+                    let vector_db_clone = vector_db.clone();
+                    tokio::spawn(async move {
+                    vector_db_clone.upsert_embedding(embedding, &file_clone).await.inspect_err(
+                        |err| println!("Error happened while upserting embedding: {err}")
+                    ).unwrap();
+                    });
+
                 }
             }
-            EmbeddingsResult::CandleEmbeddings(embeddings) => {
-                for embedding in embeddings {
-                    vector_db.upsert_embedding(embedding, file).await?;
-                }
-            }
+
             _ => { return Err(anyhow::anyhow!("Embeddings were the wrong enum variant. Embeddings from files to be embedded should be used here.")) }
         }
     }

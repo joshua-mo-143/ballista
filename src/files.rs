@@ -79,9 +79,19 @@ pub fn load_files_from_dir(dir: PathBuf, ending: &str, prefix: &PathBuf) -> Resu
             files.append(&mut sub_files);
         } else if path.is_file() {
             if let Some(ext) = path.extension() {
-                if ext.to_str().unwrap() == ending {
+                if ext.to_str().unwrap() == "md" {
                     let contents = fs::read_to_string(&path)?;
                     let path = Path::new(&path).strip_prefix(prefix)?.to_owned();
+
+                    let path_as_str = format!("{}", path.display());
+
+                    if path_as_str.to_lowercase().starts_with("templates") {
+                        println!(
+                            "File was skipped because it's in the Templates directory: {}",
+                            path.display()
+                        );
+                        continue;
+                    }
                     let key = path
                         .to_str()
                         .ok_or(anyhow!("Could not get string slice from path"))?;
@@ -94,7 +104,6 @@ pub fn load_files_from_dir(dir: PathBuf, ending: &str, prefix: &PathBuf) -> Resu
     }
     Ok(files)
 }
-
 enum FileState {
     None,
     CodeBlock,

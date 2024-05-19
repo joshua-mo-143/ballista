@@ -10,6 +10,7 @@ use crate::{llm::Conversation, EmbeddingsResult, LLMBackend, PromptBackend};
 
 use std::env;
 
+#[derive(Clone)]
 pub struct OpenAIBackend;
 
 #[async_trait::async_trait]
@@ -20,11 +21,11 @@ impl PromptBackend for OpenAIBackend {
         let stream = ChatCompletionBuilder::default()
             .model("gpt-3.5-turbo")
             .temperature(0.0)
-            .user("shuttle")
+            .user("josh")
             .messages(vec![ChatCompletionMessage {
                 role: openai::chat::ChatCompletionMessageRole::User,
                 content: Some(content),
-                name: Some("shuttle".to_string()),
+                name: Some("josh".to_string()),
                 function_call: None,
             }])
             .create_stream()

@@ -4,7 +4,7 @@ use ballista::llm::{open_ai::OpenAIBackend, LLMBackend};
 use ballista::routes::prompt::prompt;
 use ballista::routes::webhooks::handle_github_webhook;
 
-use ballista::state::{AppState, AppStateBuilder};
+use ballista::state::AppState;
 
 use ballista::qdrant::VectorDB;
 use std::env;
@@ -26,15 +26,15 @@ async fn main(
             env::set_var(x.0, x.1);
         }
     });
+    println!("Secrets found!");
 
     let vector_db = VectorDB::from_qdrant_client(qdrant);
+    println!("VectorDB created!");
 
     let llm_backend = OpenAIBackend::new()?;
+    println!("OpenAI backend created!");
 
-    let state = AppStateBuilder::new()
-        .with_qdrant_client(vector_db)
-        .with_llm(llm_backend)
-        .build()?;
+    let state = AppState::new(vector_db, llm_backend)?;
 
     let state = Arc::new(state);
 
@@ -44,7 +44,7 @@ async fn main(
         cloned_state.run_update_queue().await;
     });
 
-    state.update().await?;
+    state.notify.notify_one();
 
     let rtr = Router::new()
         .route("/prompt", post(prompt))

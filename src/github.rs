@@ -5,6 +5,7 @@ use octocrab::{models::repos::RepoCommit, repos::RepoHandler, Octocrab, Octocrab
 
 use std::env;
 use std::io::{Cursor, Read};
+use std::path::PathBuf;
 use tempfile::TempDir;
 
 use tokio_tar::Archive;
@@ -39,13 +40,18 @@ impl Octo {
         Ok(res.items.into_iter().next())
     }
 
-    pub async fn download_repo(&self, dir: &TempDir) -> Result<()> {
+    pub async fn download_repo(&self, dir: &TempDir) -> Result<PathBuf> {
         let repo = self.get_repo()?;
         let Some(commit) = self.get_latest_commit_from_repo().await? else {
             return Err(anyhow::anyhow!("Could not find a commit from the repo :("));
         };
 
-        let tarball = repo.download_tarball(commit.sha).await?;
+        let commit_sha = commit.sha;
+
+        let folder_name = format!("{}-{}-{}", self.user, self.repo, commit_sha);
+        let path = format!("{}/{}", dir.path().display(), folder_name);
+
+        let tarball = repo.download_tarball(commit_sha).await?;
 
         let meme = tarball.into_body().collect().await?.to_bytes();
 
@@ -57,6 +63,8 @@ impl Octo {
 
         ar.unpack(dir.path()).await?;
 
-        Ok(())
+        println!("{:?}", dir.path());
+
+        Ok(PathBuf::from(&path))
     }
 }

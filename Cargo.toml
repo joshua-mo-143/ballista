@@ -47,15 +47,15 @@ regex = "1.10.4"
 serde = { version = "1.0.201", features = ["derive"] }
 serde_json = "1.0.117"
 tempfile = "3.10.1"
-tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread", "sync"] }
+tokio = { version = "1.36.0", features = ["macros", "rt-multi-thread", "sync"] }
 tokio-stream = "0.1.15"
 tokio-tar = "0.3.1"
 tower-http = { version = "0.5.2", features = ["fs"] }
 
 # shuttle deployment dependencies
-shuttle-axum = { version = "0.44.0", optional = true }
-shuttle-qdrant = { version = "0.44.0", optional = true }
-shuttle-runtime = { version = "0.44.0", optional = true }
+shuttle-axum = { version = "0.45.0", optional = true }
+shuttle-qdrant = { version = "0.45.0", optional = true }
+shuttle-runtime = { version = "0.45.0", optional = true }
 
 # openai
 openai = { version = "1.0.0-alpha.14", optional = true }
@@ -67,6 +67,7 @@ candle-transformers = { version = "0.5.0", optional = true }
 hf-hub = { version = "0.3.2", features = ["tokio"], optional = true }
 tokenizers = { version = "0.19.1", optional = true, features = ["hf-hub"] }
 fastembed = "3.5.0"
+dotenvy = "0.15.7"
 
 [dev-dependencies]
 rusty-hook = "0.11.2"

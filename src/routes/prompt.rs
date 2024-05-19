@@ -41,9 +41,11 @@ pub async fn prompt<T: LLMBackend + PromptBackend>(
 ) -> impl IntoResponse {
     let chat_completion = crate::get_contents(&prompt, &app_state).await;
 
-    if let Ok(chat_completion) = chat_completion {
-        return axum_streams::StreamBodyAs::text(chat_completion_stream(chat_completion));
+    match chat_completion {
+        Ok(chat) => axum_streams::StreamBodyAs::text(chat_completion_stream(chat)),
+        Err(e) => {
+            println!("Something went wrong while prompting: {e}");
+            axum_streams::StreamBodyAs::text(error_stream())
+        }
     }
-
-    axum_streams::StreamBodyAs::text(error_stream())
 }
