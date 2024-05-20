@@ -24,7 +24,7 @@ shuttle = [
 
 
 [dependencies]
-anyhow = "1.0.82"
+anyhow = "1.0.86"
 axum = "0.7.5"
 axum-streams = { version = "0.14.2", features = ["text"] }
 bytes = "1.6.0"
