@@ -2227,15 +2227,15 @@ dependencies = [
 
 [[package]]
 name = "shuttle-qdrant"
-version = "0.44.0"
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c9877dade8fb5ca6f830656fbc2ca13456e60cd955789ce2a3e7be065cdf461"
+checksum = "9d3d273bd50d83d2d5f4040dffe13fe1e77dd4631c259d2bbb066f433c3eadac"
 dependencies = [
  "async-trait",
  "qdrant-client",
  "serde",
  "serde_json",
- "shuttle-service 0.44.0",
+ "shuttle-service 0.45.0",
 ]
 
 [[package]]
