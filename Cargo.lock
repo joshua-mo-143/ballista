@@ -2051,18 +2051,18 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.202"
+version = "1.0.203"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "226b61a0d411b2ba5ff6d7f73a476ac4f8bb900373459cd00fab8512828ba395"
+checksum = "7253ab4de971e72fb7be983802300c30b5a7f0c2e56fab8abfc6a214307c0094"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.202"
+version = "1.0.203"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6048858004bcff69094cd972ed40a32500f153bd3be9f716b2eed2e8217c4838"
+checksum = "500cbc0ebeb6f46627f50f3f5811ccf6bf00643be300b4c3eabc0ef55dc5b5ba"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2197,15 +2197,15 @@ dependencies = [
 
 [[package]]
 name = "shuttle-qdrant"
-version = "0.44.0"
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c9877dade8fb5ca6f830656fbc2ca13456e60cd955789ce2a3e7be065cdf461"
+checksum = "9d3d273bd50d83d2d5f4040dffe13fe1e77dd4631c259d2bbb066f433c3eadac"
 dependencies = [
  "async-trait",
  "qdrant-client",
  "serde",
  "serde_json",
- "shuttle-service 0.44.0",
+ "shuttle-service 0.45.0",
 ]
 
 [[package]]
