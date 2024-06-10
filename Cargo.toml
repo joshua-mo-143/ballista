@@ -35,7 +35,7 @@ http-body-util = "0.1.1"
 octocrab = "0.38.0"
 openai = "1.0.0-alpha.14"
 qdrant-client = "1.9.0"
-regex = "1.10.4"
+regex = "1.10.5"
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.117"
 shuttle-axum = { version = "0.45.0", optional = true }
