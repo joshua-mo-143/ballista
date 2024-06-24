@@ -194,9 +194,9 @@ dependencies = [
 
 [[package]]
 name = "axum-streams"
-version = "0.14.2"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22a615a041cc98964bf3bd8f0d8d4d23e0f40510b40c7ebbc6e99321c722ea60"
+checksum = "2ba443c077feaa02da75b858aef98b77cfb1c852d6d3e1c0002ac39eeda00150"
 dependencies = [
  "axum 0.7.5",
  "bytes",
@@ -2135,28 +2135,6 @@ dependencies = [
 
 [[package]]
 name = "shuttle-common"
-version = "0.44.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f4a7cbeba0ac04ff93e60e7c9cd3fb7a1a06df108b7c6c81ec4237283189f5a"
-dependencies = [
- "anyhow",
- "chrono",
- "comfy-table",
- "crossterm 0.27.0",
- "http 0.2.12",
- "semver",
- "serde",
- "serde_json",
- "strum 0.26.2",
- "tracing",
- "tracing-subscriber",
- "url",
- "uuid",
- "zeroize",
-]
-
-[[package]]
-name = "shuttle-common"
 version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd2c79ce0ce842df220bb2e70545dc3df2445813f2d68bbb1a9d953ac64a78e8"
@@ -2191,7 +2169,7 @@ dependencies = [
  "futures-core",
  "prost",
  "prost-types",
- "shuttle-common 0.45.0",
+ "shuttle-common",
  "tonic 0.10.2",
 ]
 
@@ -2205,7 +2183,7 @@ dependencies = [
  "qdrant-client",
  "serde",
  "serde_json",
- "shuttle-service 0.45.0",
+ "shuttle-service",
 ]
 
 [[package]]
@@ -2220,29 +2198,15 @@ dependencies = [
  "serde",
  "serde_json",
  "shuttle-codegen",
- "shuttle-common 0.45.0",
+ "shuttle-common",
  "shuttle-proto",
- "shuttle-service 0.45.0",
+ "shuttle-service",
  "strfmt",
  "tokio",
  "tokio-stream",
  "tokio-util",
  "tonic 0.10.2",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "shuttle-service"
-version = "0.44.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4687d5f97c43826faf9f2fa665d475696fc71857e5960c3112664480a4a6e6c"
-dependencies = [
- "anyhow",
- "async-trait",
- "serde",
- "shuttle-common 0.44.0",
- "strfmt",
- "thiserror",
 ]
 
 [[package]]
@@ -2254,7 +2218,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "serde",
- "shuttle-common 0.45.0",
+ "shuttle-common",
  "strfmt",
  "thiserror",
 ]
